@@ -120,17 +120,18 @@ function QuizContent() {
 
   if (!gameStarted && !gameOver) {
     return (
-      <div className="w-full h-screen gradient-primary flex items-center justify-center">
-        <div className="bg-background-secondary/80 backdrop-blur-md p-12 rounded-xl border-2 border-foreground neon-glow max-w-lg w-full mx-4 text-center">
-          <h2 className="text-4xl font-black text-neon-glow mb-4">
-            READY?
+      <div className="w-full h-screen gradient-primary flex items-center justify-center p-4">
+        <div className="bg-gradient-to-b from-purple-900/95 to-purple-800/95 backdrop-blur-md p-12 rounded-2xl border-4 border-accent-gold neon-glow max-w-lg w-full mx-4 text-center shadow-2xl">
+          <h2 className="text-5xl font-black text-white mb-4 drop-shadow-lg">
+            GET READY!
           </h2>
-          <p className="text-text-secondary text-lg mb-8">
-            10 questions. 10 seconds each. Test your Bible knowledge!
+          <div className="w-20 h-1 bg-gradient-to-r from-accent-gold to-transparent mx-auto mb-6"></div>
+          <p className="text-white text-xl mb-10 font-semibold leading-relaxed">
+            10 Questions • 10 Seconds Each<br/>Test Your Bible Knowledge!
           </p>
           <button
             onClick={handleStartQuiz}
-            className="w-full px-8 py-4 bg-gradient-accent text-black font-black text-xl rounded-lg neon-glow hover:scale-105 smooth-transition"
+            className="w-full px-8 py-5 bg-gradient-to-r from-accent-gold to-yellow-500 text-black font-black text-2xl rounded-lg neon-glow hover:scale-105 smooth-transition drop-shadow-lg"
           >
             START QUIZ
           </button>
@@ -143,76 +144,81 @@ function QuizContent() {
     const room = getRoom(roomCode!);
     const ranking = getRanking(roomCode!);
     const playerRank = ranking.findIndex((p) => p.id === playerInfo.id) + 1;
+    const isWinner = playerRank === 1;
 
     return (
-      <div className="w-full h-screen gradient-primary flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full">
-          <div className="text-center mb-8">
-            <h2 className="text-5xl font-black text-neon-glow mb-4">
-              {playerRank === 1 ? 'VICTORY!' : 'GAME OVER'}
+      <div className="w-full h-screen gradient-primary flex items-center justify-center p-4 overflow-y-auto">
+        <div className="max-w-2xl w-full py-8">
+          <div className="text-center mb-12">
+            <h2 className={`text-6xl font-black mb-4 drop-shadow-lg ${isWinner ? 'text-accent-gold' : 'text-white'}`}>
+              {isWinner ? '🏆 VICTORY!' : '⚔️ GAME OVER'}
             </h2>
+            <p className="text-2xl font-bold text-white">
+              #{playerRank} Place
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <div className="bg-background-secondary/80 backdrop-blur-md p-6 rounded-xl border-2 border-foreground neon-glow">
-              <p className="text-text-secondary text-sm mb-2">YOUR SCORE</p>
-              <p className="text-4xl font-black text-neon-glow">{score}/10</p>
-              <p className="text-text-secondary text-sm mt-2">
+          <div className="grid grid-cols-2 gap-6 mb-10">
+            <div className="bg-gradient-to-b from-purple-900/95 to-purple-800/95 backdrop-blur-md p-8 rounded-xl border-3 border-accent-gold neon-glow shadow-lg">
+              <p className="text-white text-sm font-bold mb-2">YOUR SCORE</p>
+              <p className="text-5xl font-black text-accent-gold mb-2">{score}/10</p>
+              <p className="text-white font-bold text-lg">
                 {Math.round((score / 10) * 100)}% Accuracy
               </p>
             </div>
 
             {opponentInfo.id && (
-              <div className="bg-background-secondary/80 backdrop-blur-md p-6 rounded-xl border-2 border-accent-cyan neon-glow-cyan">
-                <p className="text-text-secondary text-sm mb-2">
-                  {opponentInfo.name.toUpperCase()}&apos;S SCORE
+              <div className="bg-gradient-to-b from-blue-900/95 to-cyan-900/95 backdrop-blur-md p-8 rounded-xl border-3 border-white neon-glow-cyan shadow-lg">
+                <p className="text-white text-sm font-bold mb-2">
+                  {opponentInfo.name.toUpperCase()}
                 </p>
-                <p className="text-4xl font-black text-accent-cyan">
+                <p className="text-5xl font-black text-white mb-2">
                   {opponentInfo.score}/10
                 </p>
-                <p className="text-text-secondary text-sm mt-2">
+                <p className="text-white font-bold text-lg">
                   {Math.round((opponentInfo.score / 10) * 100)}% Accuracy
                 </p>
               </div>
             )}
           </div>
 
-          <div className="bg-background-secondary/80 backdrop-blur-md p-8 rounded-xl border-2 border-accent-gold mb-8">
-            <h3 className="text-2xl font-black text-accent-gold mb-6 text-center">
-              LEADERBOARD
+          <div className="bg-gradient-to-b from-yellow-900/90 to-yellow-800/90 backdrop-blur-md p-10 rounded-xl border-3 border-accent-gold neon-glow mb-10 shadow-lg">
+            <h3 className="text-3xl font-black text-white mb-8 text-center drop-shadow-lg">
+              🏅 LEADERBOARD
             </h3>
-            <div className="space-y-3">
-              {ranking.map((player, index) => (
-                <div
-                  key={player.id}
-                  className={`flex items-center justify-between p-4 rounded-lg border-2 ${
-                    player.id === playerInfo.id
-                      ? 'border-neon-glow bg-background/50'
-                      : 'border-text-secondary/20 bg-background/30'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="text-2xl font-black text-accent-gold w-8">
-                      #{index + 1}
+            <div className="space-y-4">
+              {ranking.map((player, index) => {
+                const medals = ['🥇', '🥈', '🥉'];
+                return (
+                  <div
+                    key={player.id}
+                    className={`flex items-center justify-between p-5 rounded-lg border-3 font-bold ${
+                      player.id === playerInfo.id
+                        ? 'bg-gradient-to-r from-accent-gold/30 to-yellow-500/30 border-accent-gold'
+                        : 'bg-background/50 border-white/30'
+                    } shadow-md`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-3xl w-10">{medals[index] || '📌'}</span>
+                      <div>
+                        <p className="text-white text-lg">
+                          {player.name}
+                          {player.id === playerInfo.id ? ' (You)' : ''}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold text-white">
-                        {player.name}
-                        {player.id === playerInfo.id ? ' (You)' : ''}
-                      </p>
+                    <div className="text-3xl font-black text-white">
+                      {player.score}
                     </div>
                   </div>
-                  <div className="text-2xl font-black text-neon-glow">
-                    {player.score}/10
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           <button
             onClick={() => (window.location.href = '/')}
-            className="w-full px-8 py-4 bg-text-secondary text-black font-black text-xl rounded-lg hover:bg-white smooth-transition"
+            className="w-full px-8 py-5 bg-gradient-to-r from-white to-gray-200 text-black font-black text-xl rounded-lg hover:scale-105 smooth-transition drop-shadow-lg"
           >
             BACK TO MENU
           </button>
@@ -237,56 +243,62 @@ function QuizContent() {
   return (
     <div className="w-full h-screen gradient-primary flex items-center justify-center p-4">
       <div className="max-w-2xl w-full">
-        <div className="flex justify-between items-center mb-8">
-          <div className="flex gap-4">
-            <div className="bg-background-secondary/80 backdrop-blur-md px-4 py-2 rounded-lg border-2 border-foreground neon-glow">
-              <p className="text-text-secondary text-xs">YOUR SCORE</p>
-              <p className="text-2xl font-black text-neon-glow">{score}</p>
+        <div className="flex justify-between items-center mb-10">
+          <div className="flex gap-3">
+            <div className="bg-gradient-to-br from-purple-900/95 to-purple-800/95 backdrop-blur-md px-6 py-3 rounded-lg border-3 border-accent-gold neon-glow shadow-lg">
+              <p className="text-white text-xs font-bold">YOUR SCORE</p>
+              <p className="text-3xl font-black text-accent-gold">{score}</p>
             </div>
             {opponentInfo.id && (
-              <div className="bg-background-secondary/80 backdrop-blur-md px-4 py-2 rounded-lg border-2 border-accent-cyan neon-glow-cyan">
-                <p className="text-text-secondary text-xs">OPPONENT</p>
-                <p className="text-2xl font-black text-accent-cyan">
+              <div className="bg-gradient-to-br from-blue-900/95 to-cyan-900/95 backdrop-blur-md px-6 py-3 rounded-lg border-3 border-white neon-glow-cyan shadow-lg">
+                <p className="text-white text-xs font-bold">OPPONENT</p>
+                <p className="text-3xl font-black text-white">
                   {opponentInfo.score}
                 </p>
               </div>
             )}
           </div>
 
-          <div className="bg-background-secondary/80 backdrop-blur-md px-6 py-2 rounded-lg border-2 border-accent-gold">
-            <p className="text-accent-gold font-black text-xl">{timeLeft}s</p>
+          <div className="bg-gradient-to-br from-yellow-900/95 to-yellow-800/95 backdrop-blur-md px-8 py-3 rounded-lg border-3 border-accent-gold neon-glow shadow-lg">
+            <p className="text-accent-gold font-black text-3xl">{timeLeft}</p>
+            <p className="text-white text-xs font-bold">seconds</p>
           </div>
         </div>
 
-        <div className="mb-4 bg-background-secondary/80 backdrop-blur-md p-6 rounded-xl border-2 border-foreground neon-glow">
-          <p className="text-text-secondary mb-4">
-            QUESTION {currentQuestion + 1} OF {questions.length}
-          </p>
-          <div className="w-full bg-background rounded-lg h-2 mb-6">
+        <div className="mb-6 bg-gradient-to-b from-purple-900/95 to-purple-800/95 backdrop-blur-md p-8 rounded-2xl border-3 border-accent-gold neon-glow shadow-lg">
+          <div className="flex justify-between items-center mb-6">
+            <p className="text-white font-black text-lg">
+              Q{currentQuestion + 1} / {questions.length}
+            </p>
+            <p className="text-accent-gold font-black text-lg">
+              {Math.round(((currentQuestion + 1) / questions.length) * 100)}%
+            </p>
+          </div>
+          <div className="w-full bg-background/50 rounded-full h-3 mb-8 border-2 border-accent-gold/30">
             <div
-              className="bg-gradient-accent h-full rounded-lg transition-all"
+              className="bg-gradient-to-r from-accent-gold to-yellow-400 h-full rounded-full transition-all shadow-lg"
               style={{ width: `${((currentQuestion + 1) / questions.length) * 100}%` }}
             />
           </div>
-          <h2 className="text-2xl font-black text-white mb-8">
+          <h2 className="text-3xl font-black text-white mb-10 leading-tight">
             {question.question}
           </h2>
 
           <div className="grid grid-cols-2 gap-4">
             {question.options.map((option, index) => {
               let buttonClass =
-                'bg-background-secondary/50 border-2 border-text-secondary/30 text-white';
+                'bg-gradient-to-br from-blue-600/20 to-blue-700/20 border-3 border-white text-white hover:scale-105';
 
               if (isAnswered) {
                 if (index === question.correct) {
                   buttonClass =
-                    'bg-green-600/30 border-2 border-green-500 text-green-400';
+                    'bg-gradient-to-br from-green-600 to-green-700 border-3 border-white text-white scale-100';
                 } else if (index === selectedAnswer && !isCorrect) {
                   buttonClass =
-                    'bg-red-600/30 border-2 border-red-500 text-red-400';
+                    'bg-gradient-to-br from-red-600 to-red-700 border-3 border-white text-white scale-100';
                 } else {
                   buttonClass =
-                    'bg-background-secondary/30 border-2 border-text-secondary/20 text-text-secondary';
+                    'bg-background/50 border-3 border-white/30 text-gray-300 scale-100';
                 }
               }
 
@@ -295,12 +307,12 @@ function QuizContent() {
                   key={index}
                   onClick={() => handleAnswer(index)}
                   disabled={isAnswered}
-                  className={`p-4 rounded-lg font-bold text-lg smooth-transition hover:scale-105 disabled:hover:scale-100 ${buttonClass}`}
+                  className={`p-5 rounded-lg font-black text-lg smooth-transition disabled:hover:scale-100 ${buttonClass}`}
                 >
-                  <span className="font-black text-xl mr-2">
+                  <span className="text-2xl mr-2">
                     {String.fromCharCode(65 + index)}.
                   </span>
-                  {option}
+                  <span className="inline-block">{option}</span>
                 </button>
               );
             })}
@@ -308,13 +320,13 @@ function QuizContent() {
         </div>
 
         {showResult && (
-          <div className="text-center">
+          <div className="text-center animate-bounce">
             <p
-              className={`text-2xl font-black ${
+              className={`text-4xl font-black drop-shadow-lg ${
                 isCorrect ? 'text-green-400' : 'text-red-400'
               }`}
             >
-              {isCorrect ? 'CORRECT!' : 'INCORRECT'}
+              {isCorrect ? '✓ CORRECT!' : '✗ INCORRECT'}
             </p>
           </div>
         )}
