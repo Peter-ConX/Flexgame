@@ -3,6 +3,8 @@
 :root {
   --background: #000000;
   --foreground: #22ff22;
+  --accent-red: #ef4444;
+  --accent-green: #22ff22;
 }
 
 @theme inline {
@@ -35,5 +37,10 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+/* Text shadow for biblical feel */
+.text-shadow {
+  text-shadow: 0 0 10px rgba(34, 255, 34, 0.5);
 }
 

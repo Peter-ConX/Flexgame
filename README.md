@@ -1,199 +1,250 @@
-# FlexGame - River of Games 🌊
+# Bible Quiz - Interactive Game Platform 🌊
 
-An interactive gaming platform with a stunning water-based UI design. Users can sign up, authenticate, and play 10 exciting games.
+A no-login required Bible quiz game with an interactive water wave effect, daily credit system, and 45 comprehensive Bible questions.
 
 ## Features
 
-### ✨ Authentication System
-- **Sign Up**: Users register with their email
-- **Default Credentials**: Email is username, password is `3010`
-- **Email Notification**: Credentials sent via email (simulated in MVP)
-- **Password Change**: Forced password change on first login
-- **Secure Session**: Token-based authentication
+### 🎮 Game Mechanics
+- **45 Bible Quiz Questions** across 3 difficulty levels (15 easy, 15 medium, 15 hard)
+- **10-second timer** per question with automatic progression
+- **Multiple-choice format** with instant feedback (correct answers turn green)
+- **Score tracking** with real-time accuracy updates
+- **Earning System**: 10 coins per correct answer
 
-### 🎮 10 Games Included
+### 💰 Credit System
+- **100 daily credits** automatically reset each day at midnight
+- **20 credits per game** - required to start a quiz
+- **Instant credit deduction** when starting a game
+- **Rewards for correct answers** - earn 10 coins per correct question
+- **Persistent storage** using browser localStorage
+- **No login required** - instant access to gameplay
 
-1. **Bible Trivia** - Test your biblical knowledge (📖)
-2. **Word Scramble** - Unscramble letters to form words (🔤)
-3. **Memory Match** - Match pairs of cards (🧠)
-4. **Quiz Master** - General knowledge questions (❓)
-5. **Typing Race** - Test your typing speed (⌨️)
-6. **Number Puzzle** - Solve mathematical challenges (🔢)
-7. **Flappy Bird Clone** - Classic avoidance game (🐦)
-8. **Snake Game** - Classic snake gameplay (🐍)
-9. **Puzzle Master** - Complex puzzle challenges (🧩)
-10. **Reaction Time** - Measure your reflexes (⚡)
+### 🌊 Interactive Water Effect
+- **Dynamic water waves** that respond to mouse clicks and touch
+- **Red, green, and black color scheme** for biblical aesthetic
+- **Smooth animations** with physics-based wave propagation
+- **Touch-friendly** for mobile devices
+- **Immersive visual experience** on homepage
 
-### 🎨 Design Features
-- **Color Scheme**: Red (#ff0000), Green (#22ff22), Black (#000000)
-- **Water Effects**: Interactive canvas with wave animations
-- **Responsive Design**: Works on desktop and mobile
-- **Touch-Friendly**: Click anywhere to create water ripples
+### 🎨 Design
+- **Dark theme** with high contrast for readability
+- **Red and green accent colors** (biblical/gaming aesthetic)
+- **Responsive layout** that works on desktop and mobile
+- **Clean, modern interface** with smooth transitions
+- **Tailwind CSS v4** for styling
 
-## Tech Stack
+## How to Play
 
-**Frontend**
-- Next.js 14+
-- React 18+
-- TypeScript
-- Tailwind CSS
-- Canvas API for water effects
+### Starting a Game
+1. Visit the homepage at `http://localhost:3000`
+2. Check your daily credits (displayed in top-right corner)
+3. Click **"Start Quiz (20 coins)"** button
+4. Answer 45 Bible questions within the 10-second time limit per question
 
-**Backend**
-- Next.js API Routes
-- Mock Database (ready for MongoDB/Firebase integration)
-- JWT Tokens for authentication
+### Answering Questions
+- Click on one of the four multiple-choice options (A, B, C, or D)
+- Correct answers turn **green** and you earn points
+- Wrong answers turn **red**
+- The game automatically moves to the next question
+- Progress bar shows your completion status
+
+### Viewing Results
+- After completing all 45 questions, see your final score
+- View percentage accuracy
+- Coins earned (score × 10)
+- New credit balance
+- Option to play again or return home
+
+## Technical Stack
+
+- **Framework**: Next.js 16 with App Router
+- **Styling**: Tailwind CSS v4
+- **Language**: TypeScript
+- **State Management**: React Hooks with localStorage
+- **Canvas**: HTML5 Canvas for water wave effects
+- **Package Manager**: npm or pnpm
 
 ## Installation & Setup
 
-### 1. Clone the Repository
-```bash
-git clone https://github.com/Peter-ConX/Flexgame.git
-cd flexgame
-```
-
-### 2. Install Dependencies
+### 1. Install Dependencies
 ```bash
 npm install
 ```
 
-### 3. Environment Setup
-Create a `.env.local` file:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:3000
-DATABASE_URL=mongodb://localhost:27017/flexgame
-JWT_SECRET=your-secret-key-here
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password
-```
-
-### 4. Run Development Server
+### 2. Run Development Server
 ```bash
 npm run dev
 ```
 
 Visit `http://localhost:3000` in your browser.
 
-## Usage
-
-1. **Home Page**: Click Login or Sign Up
-2. **Sign Up**: Enter your email
-3. **Login**: Use your email and password `3010`
-4. **Change Password**: Update your password on first login
-5. **Play Games**: Select any of the 10 games from the dashboard
-6. **Earn Points**: Complete games to earn scores
-
-## Test Account
-- **Email**: test@example.com
-- **Password**: 3010
-
-## Deployment to Vercel
-
-### 1. Push to GitHub
+### 3. Build for Production
 ```bash
-git add .
-git commit -m "Initial FlexGame MVP"
-git push origin main
+npm run build
+npm start
 ```
 
-### 2. Deploy to Vercel
-1. Go to [vercel.com](https://vercel.com)
-2. Click "New Project"
-3. Select your GitHub repo
-4. Configure environment variables
-5. Deploy!
-
-### 3. Custom Domain
-Once deployed, add your custom domain through Vercel dashboard.
-
-## Project Structure
+## File Structure
 
 ```
 flexgame/
 ├── app/
-│   ├── api/
-│   │   └── auth/              # Authentication endpoints
-│   ├── auth/                  # Auth pages (login, signup, change-password)
-│   ├── dashboard/             # Game dashboard
-│   ├── games/                 # Individual game components
-│   ├── layout.tsx             # Root layout
-│   ├── page.tsx               # Home page with water effects
-│   └── globals.css            # Global styles
-├── public/                    # Static assets
-├── .env.local                 # Environment variables
-├── tailwind.config.ts         # Tailwind configuration
-├── tsconfig.json              # TypeScript configuration
-└── package.json               # Dependencies
+│   ├── page.tsx              # Homepage with water effect and credit display
+│   ├── layout.tsx            # Root layout with metadata
+│   ├── globals.css           # Global styles and theme
+│   └── quiz/
+│       └── page.tsx          # Quiz game interface and logic
+├── lib/
+│   ├── quizData.ts          # 45 Bible questions database
+│   └── creditsProvider.ts   # Credit system logic (daily reset, deduction)
+├── package.json             # Dependencies
+├── tsconfig.json            # TypeScript configuration
+└── tailwind.config.js       # Tailwind configuration
 ```
 
-## API Endpoints
+## Key Components
 
-### Authentication
-- `POST /api/auth/signup` - Register new user
-- `POST /api/auth/login` - Login user
-- `POST /api/auth/change-password` - Change password
+### Home Page (`app/page.tsx`)
+- Interactive water wave canvas with click/touch response
+- Credit balance display with gradient styling
+- Play button with affordability check
+- Daily reset logic
+- Status indicator for ready-to-play state
 
-### Response Format
-```json
-{
-  "success": true,
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-  "message": "Success message"
-}
-```
+### Quiz Page (`app/quiz/page.tsx`)
+- Question display with 10-second countdown
+- Multiple-choice answer buttons with A/B/C/D labels
+- Real-time score tracking
+- Progress bar showing quiz completion
+- Results screen with earnings summary
+- Navigation to home or replay
+
+### Quiz Data (`lib/quizData.ts`)
+- 45 carefully selected Bible questions
+- Easy, Medium, and Hard difficulty levels
+- Multiple-choice options for each question
+- Correct answer indicators
+- XP reward values
+
+### Credits Provider (`lib/creditsProvider.ts`)
+- Daily credit management
+- Date-based reset (midnight UTC)
+- Credit deduction for game play
+- Credit rewards for correct answers
+- Persistent storage with validation
+
+## Gameplay Rules
+
+- **Timer**: 10 seconds per question (auto-advance if no answer)
+- **Cost**: 20 credits per game
+- **Reward**: 10 credits per correct answer (max 450 credits per perfect game)
+- **Daily Limit**: 100 credits reset at midnight each day
+- **No Authentication**: Completely open access
+- **Questions**: 45 total across all difficulty levels
+
+## Color Scheme
+
+- **Background**: Pure black (#000000)
+- **Primary**: Green (#22ff22) - correct answers, emphasis
+- **Accent**: Red (#ef4444) - wrong answers, borders
+- **Text**: White on dark backgrounds for contrast
+- **Gradients**: Green gradients for interactive elements
+
+## Browser Compatibility
+
+- Modern browsers with ES6 support
+- Canvas API support for water effects
+- localStorage support for persistence
+- Works on desktop, tablet, and mobile
+- Tested on Chrome, Firefox, Safari, Edge
+
+## Credits and Scoring
+
+### Earning Credits
+- **Start with**: 100 daily credits
+- **Game cost**: 20 coins
+- **Correct answer bonus**: 10 coins each
+- **Maximum per game**: 450 coins (45 correct answers)
+- **Total possible per day**: 550 coins (100 base + 450 bonus)
+
+### Daily Reset
+- Credits reset at midnight UTC
+- Based on calendar date, not 24-hour rolling window
+- Players who run out can wait until next day
+- Reset happens automatically in browser
+
+## Example Quiz Questions
+
+### Easy Level
+- "Who built the ark?" (Answer: Noah)
+- "What is the first book of the Bible?" (Answer: Genesis)
+- "Who betrayed Jesus?" (Answer: Judas)
+
+### Medium Level
+- "Who interpreted Pharaoh's dreams?" (Answer: Joseph)
+- "What city did the walls fall after marching around it?" (Answer: Jericho)
+- "Who was the first king of Israel?" (Answer: Saul)
+
+### Hard Level
+- "Which prophet confronted King Ahab on Mount Carmel?" (Answer: Elijah)
+- "Who was the prophet that married a prostitute as a sign to Israel?" (Answer: Hosea)
+- "Who was the king who saw the writing on the wall?" (Answer: Belshazzar)
 
 ## Future Enhancements
 
-- [ ] Real MongoDB integration
-- [ ] Email notifications with Nodemailer
-- [ ] Leaderboard system
-- [ ] Game statistics tracking
-- [ ] Multiplayer games
-- [ ] In-game achievements
-- [ ] Sound effects and music
-- [ ] Dark mode toggle
-- [ ] User profiles
-- [ ] Game difficulty levels
+Potential features for future releases:
+- Difficulty selection (Easy/Medium/Hard only)
+- Multiplayer competitive mode
+- Leaderboards with persistent rankings
+- Achievement badges and milestones
+- Question categories by Bible books
+- Customizable daily credit amounts
+- Admin dashboard for managing questions
+- Sound effects and background music
+- Difficulty-based rewards
+- Streaks and daily challenges
 
-## Contributing
+## Development Notes
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+- All data is stored in browser localStorage
+- No server-side persistence required
+- Perfect for standalone deployment
+- Great for educational purposes
+- Easy to customize questions and credit amounts
+- Water effect uses requestAnimationFrame for smooth 60fps animation
 
-## License
+## Performance Considerations
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+- Optimized for fast load times
+- Minimal dependencies
+- Efficient canvas rendering
+- Lazy-loaded quiz questions
+- Smooth animations with GPU acceleration
+- Mobile-optimized touch interactions
 
-## Author
+## Deployment
 
-**Peter Okoro** - FlexGame Creator
+### Deploy to Vercel
+```bash
+npm install -g vercel
+vercel
+```
 
-## Support
+### Deploy to Other Platforms
+- Build: `npm run build`
+- Start: `npm start`
+- Port: 3000 (configurable)
 
-For support, email your-email@example.com or open an issue on GitHub.
+## Learning Resources
+
+- Bible Quiz Questions - Comprehensive collection across difficulty levels
+- Water Wave Physics - Based on sine wave propagation
+- React Hooks - State management and side effects
+- Canvas API - 2D drawing and animation
+- localStorage - Client-side data persistence
 
 ---
 
-**Built with ❤️ by Peter Okoro**
+**Built with ❤️ as a Bible quiz game with interactive water effects**
 
-*"Turn every click into waves of fun!"* 🌊🎮
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*"Test your Bible knowledge with the River of Questions!"* 🌊📖
