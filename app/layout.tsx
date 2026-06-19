@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Flexgame - River of Games",
-  description: "Interactive game platform with water effects",
+  title: "Bible Quiz - Multiplayer Arena",
+  description: "Test your Bible knowledge in multiplayer matches with neon particle effects",
 };
 
 export default function RootLayout({

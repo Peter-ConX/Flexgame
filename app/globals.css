@@ -1,10 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #22ff22;
-  --accent-red: #ef4444;
-  --accent-green: #22ff22;
+  --background: #050f1e;
+  --background-secondary: #0a1a30;
+  --foreground: #00ff88;
+  --accent-cyan: #00ffcc;
+  --accent-purple: #ff00ff;
+  --accent-gold: #ffd700;
+  --text-primary: #ffffff;
+  --text-secondary: #b0b0b0;
+  --border-color: #00ff8833;
+  --shadow-glow: 0 0 20px rgba(0, 255, 136, 0.3);
 }
 
 @theme inline {
@@ -16,31 +22,69 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #000000;
-    --foreground: #22ff22;
+    --background: #050f1e;
+    --background-secondary: #0a1a30;
+    --foreground: #00ff88;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-  overflow-x: hidden;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html, body {
+html {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: 'Arial', 'Helvetica', sans-serif;
   width: 100%;
   height: 100%;
   margin: 0;
   padding: 0;
+  overflow-x: hidden;
 }
 
-/* Text shadow for biblical feel */
-.text-shadow {
-  text-shadow: 0 0 10px rgba(34, 255, 34, 0.5);
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Neon glow effect */
+.neon-glow {
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.4), 0 0 40px rgba(0, 255, 136, 0.2);
+}
+
+.neon-glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.4), 0 0 40px rgba(0, 255, 204, 0.2);
+}
+
+.neon-glow-purple {
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.4), 0 0 40px rgba(255, 0, 255, 0.2);
+}
+
+/* Text shadow for neon effect */
+.text-neon-glow {
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5), 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.text-neon-glow-cyan {
+  text-shadow: 0 0 10px rgba(0, 255, 204, 0.5), 0 0 20px rgba(0, 255, 204, 0.3);
+}
+
+/* Smooth transitions */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Gradient backgrounds */
+.gradient-primary {
+  background: linear-gradient(135deg, #050f1e 0%, #0a1a30 100%);
+}
+
+.gradient-accent {
+  background: linear-gradient(135deg, #00ff88 0%, #00ffcc 100%);
 }
 

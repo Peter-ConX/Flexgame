@@ -1,166 +1,182 @@
 'use client';
 
-import { useState, useRef, useEffect, MouseEvent, TouchEvent } from 'react';
-import Link from 'next/link';
-import { getCredits } from '@/lib/creditsProvider';
-import { GAME_COST } from '@/lib/quizData';
-
-interface WavePoint {
-  x: number;
-  y: number;
-  velocity: number;
-}
+import { useState, useRef, useEffect } from 'react';
+import { ParticleWaterEffect } from '@/lib/particleWater';
+import { createRoom, joinRoom } from '@/lib/roomSystem';
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [waves, setWaves] = useState<WavePoint[]>([]);
-  const [credits, setCredits] = useState(0);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    setCredits(getCredits());
-  }, []);
+  const [screen, setScreen] = useState<'menu' | 'create' | 'join'>('menu');
+  const [roomCode, setRoomCode] = useState('');
+  const [error, setError] = useState('');
+  const particleSystemRef = useRef<ParticleWaterEffect | null>(null);
+  const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const animate = () => {
-      // Clear canvas with black background
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      // Draw water waves with red-green-black theme
-      if (waves.length > 0) {
-        ctx.strokeStyle = '#22ff22';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-
-        const points = Array.from({ length: canvas.width }, (_, i) => {
-          let y = canvas.height / 2;
-          waves.forEach((wave) => {
-            const dist = Math.abs(i - wave.x);
-            if (dist < 200) {
-              y += Math.sin(dist * 0.05) * wave.velocity * 30;
-            }
-          });
-          return { x: i, y };
-        });
-
-        points.forEach((point, i) => {
-          if (i === 0) ctx.moveTo(point.x, point.y);
-          else ctx.lineTo(point.x, point.y);
-        });
-
-        ctx.lineTo(canvas.width, canvas.height);
-        ctx.lineTo(0, canvas.height);
-        ctx.closePath();
-
-        ctx.fillStyle = 'rgba(34, 255, 34, 0.3)';
-        ctx.fill();
-        ctx.stroke();
-
-        // Update waves
-        setWaves((prevWaves) =>
-          prevWaves
-            .map((w) => ({
-              ...w,
-              velocity: w.velocity * 0.95,
-            }))
-            .filter((w) => w.velocity > 0.01)
-        );
-      }
-
-      requestAnimationFrame(animate);
-    };
-
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+
+    const particleSystem = new ParticleWaterEffect(canvas);
+    particleSystemRef.current = particleSystem;
+
+    const animate = () => {
+      particleSystem.render();
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
 
     const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
 
+    const handleClick = (e: MouseEvent) => {
+      particleSystem.createExplosion(e.clientX, e.clientY, 60);
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      Array.from(e.touches).forEach((touch) => {
+        particleSystem.createExplosion(touch.clientX, touch.clientY, 40);
+      });
+    };
+
     window.addEventListener('resize', handleResize);
-    animate();
+    canvas.addEventListener('click', handleClick);
+    canvas.addEventListener('touchstart', handleTouchStart);
 
-    return () => window.removeEventListener('resize', handleResize);
-  }, [waves]);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      canvas.removeEventListener('click', handleClick);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, []);
 
-  const handleInteraction = (e: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>) => {
-    let clientX = 0;
-    if ('clientX' in e) {
-      clientX = e.clientX;
-    } else if (e.touches.length > 0) {
-      clientX = e.touches[0].clientX;
+  const handleCreateRoom = () => {
+    try {
+      const room = createRoom();
+      window.location.href = `/quiz?room=${room.code}`;
+    } catch (err) {
+      setError('Failed to create room');
     }
-    
-    setWaves((prev) => [
-      ...prev,
-      { x: clientX, y: 0, velocity: 1 },
-    ]);
+  };
+
+  const handleJoinRoom = () => {
+    if (!roomCode.trim()) {
+      setError('Please enter a room code');
+      return;
+    }
+
+    const room = joinRoom(roomCode.toUpperCase());
+    if (!room) {
+      setError('Room not found');
+      return;
+    }
+
+    window.location.href = `/quiz?room=${roomCode.toUpperCase()}`;
   };
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-black relative">
+    <div className="w-full h-screen overflow-hidden gradient-primary relative">
       <canvas
         ref={canvasRef}
-        onClick={handleInteraction}
-        onTouchStart={handleInteraction}
-        className="absolute top-0 left-0 cursor-pointer"
+        className="absolute top-0 left-0 w-full h-full"
       />
 
-      {/* Credits display */}
-      {mounted && (
-        <div className="absolute top-6 right-6 z-20 bg-gradient-to-b from-green-600 to-green-700 px-6 py-3 rounded-lg border-2 border-red-600 pointer-events-none">
-          <p className="text-black font-bold text-lg">CREDITS</p>
-          <p className="text-white text-2xl font-bold">{credits}</p>
-        </div>
-      )}
-
       <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
-        <h1 className="text-6xl font-bold text-green-500 mb-4 pointer-events-auto text-shadow">
-          Bible Quiz
-        </h1>
-        {mounted && (
-          <>
-            <p className="text-xl text-green-400 mb-2 pointer-events-auto">
-              {credits >= GAME_COST ? '✓ Ready to play!' : '✗ Not enough credits'}
-            </p>
-            <p className="text-green-400 mb-8 pointer-events-auto">
-              Touch the water to create waves
-            </p>
-          </>
-        )}
+        <div className="mb-12 pointer-events-auto text-center">
+          <h1 className="text-7xl font-black text-neon-glow mb-2">
+            BIBLE QUIZ
+          </h1>
+          <p className="text-2xl text-accent-cyan font-bold tracking-wider">
+            MULTIPLAYER ARENA
+          </p>
+        </div>
 
-        {mounted && (
-          <div className="flex gap-4 pointer-events-auto">
-            {credits >= GAME_COST ? (
-              <Link href="/quiz">
-                <button className="px-10 py-4 bg-green-600 hover:bg-green-700 text-black font-bold rounded-lg border-2 border-red-600 transition text-lg shadow-lg">
-                  Start Quiz ({GAME_COST} coins)
-                </button>
-              </Link>
-            ) : (
-              <button
-                disabled
-                className="px-10 py-4 bg-gray-600 text-gray-400 font-bold rounded-lg border-2 border-gray-600 cursor-not-allowed text-lg"
-              >
-                Not Enough Credits
-              </button>
-            )}
+        {screen === 'menu' && (
+          <div className="flex flex-col gap-6 pointer-events-auto">
+            <button
+              onClick={() => setScreen('create')}
+              className="px-12 py-4 bg-gradient-accent text-black font-black text-xl rounded-lg neon-glow hover:scale-105 smooth-transition border-2 border-foreground shadow-xl"
+            >
+              CREATE ROOM
+            </button>
+            <button
+              onClick={() => setScreen('join')}
+              className="px-12 py-4 bg-foreground text-black font-black text-xl rounded-lg neon-glow-cyan hover:scale-105 smooth-transition border-2 border-accent-cyan"
+            >
+              JOIN ROOM
+            </button>
           </div>
         )}
 
-        {mounted && credits < GAME_COST && (
-          <p className="text-red-500 mt-4 text-sm pointer-events-auto">
-            Come back tomorrow for 100 daily credits!
-          </p>
+        {screen === 'create' && (
+          <div className="bg-background-secondary/80 backdrop-blur-md p-8 rounded-xl border-2 border-foreground neon-glow pointer-events-auto max-w-md w-full mx-4">
+            <h2 className="text-3xl font-bold text-neon-glow mb-6 text-center">
+              CREATE ROOM
+            </h2>
+            <p className="text-text-secondary text-center mb-6">
+              Share your room code with a friend to play
+            </p>
+            <button
+              onClick={handleCreateRoom}
+              className="w-full px-6 py-3 bg-gradient-accent text-black font-black text-lg rounded-lg neon-glow hover:scale-105 smooth-transition mb-4"
+            >
+              START NEW GAME
+            </button>
+            <button
+              onClick={() => {
+                setScreen('menu');
+                setError('');
+              }}
+              className="w-full px-6 py-3 bg-text-secondary text-black font-bold text-lg rounded-lg hover:bg-white smooth-transition"
+            >
+              BACK
+            </button>
+          </div>
+        )}
+
+        {screen === 'join' && (
+          <div className="bg-background-secondary/80 backdrop-blur-md p-8 rounded-xl border-2 border-accent-cyan neon-glow-cyan pointer-events-auto max-w-md w-full mx-4">
+            <h2 className="text-3xl font-bold text-neon-glow-cyan mb-6 text-center">
+              JOIN ROOM
+            </h2>
+            <input
+              type="text"
+              value={roomCode}
+              onChange={(e) => {
+                setRoomCode(e.target.value.toUpperCase());
+                setError('');
+              }}
+              placeholder="ENTER CODE"
+              className="w-full px-4 py-3 bg-background border-2 border-accent-cyan rounded-lg text-center text-xl font-bold text-foreground placeholder-text-secondary mb-4 focus:outline-none focus:ring-2 focus:ring-accent-cyan"
+            />
+            {error && (
+              <p className="text-red-400 text-center mb-4 font-bold">{error}</p>
+            )}
+            <button
+              onClick={handleJoinRoom}
+              className="w-full px-6 py-3 bg-accent-cyan text-black font-black text-lg rounded-lg neon-glow-cyan hover:scale-105 smooth-transition mb-4"
+            >
+              JOIN GAME
+            </button>
+            <button
+              onClick={() => {
+                setScreen('menu');
+                setError('');
+                setRoomCode('');
+              }}
+              className="w-full px-6 py-3 bg-text-secondary text-black font-bold text-lg rounded-lg hover:bg-white smooth-transition"
+            >
+              BACK
+            </button>
+          </div>
         )}
       </div>
     </div>
