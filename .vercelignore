@@ -1,0 +1,11 @@
+# Vercel ignore patterns
+.env.local
+.env.*.local
+*.md
+!README.md
+.git
+.gitignore
+.vscode
+.idea
+.DS_Store
+*.log
