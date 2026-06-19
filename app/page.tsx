@@ -77,25 +77,24 @@ export default function Home() {
     }
   };
 
-  const handleUsernameJoin = () => {
-    if (!username.trim()) {
-      setError('Please enter a username');
-      return;
-    }
+  const handleStartJoin = () => {
     setScreen('join');
-    setUsername('');
     setError('');
   };
 
   const handleJoinRoom = () => {
+    if (!username.trim()) {
+      setError('Please enter your name');
+      return;
+    }
     if (!roomCode.trim()) {
-      setError('Please enter a room code');
+      setError('Please enter a room code (6 characters)');
       return;
     }
 
     const room = joinRoom(roomCode.toUpperCase(), username);
     if (!room) {
-      setError('Room not found');
+      setError('Room code not found. Check and try again.');
       return;
     }
 
@@ -141,7 +140,7 @@ export default function Home() {
               CREATE ROOM
             </button>
             <button
-              onClick={() => setScreen('join')}
+              onClick={handleStartJoin}
               className="px-16 py-5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-black text-2xl rounded-xl neon-glow-cyan hover:scale-110 smooth-transition border-3 border-white shadow-2xl drop-shadow-lg"
             >
               JOIN ROOM
@@ -258,11 +257,13 @@ export default function Home() {
         )}
 
         {screen === 'join' && (
-          <div className="bg-gradient-to-b from-blue-900/95 to-cyan-900/95 backdrop-blur-md p-10 rounded-2xl border-3 border-white neon-glow-cyan pointer-events-auto max-w-md w-full mx-4 shadow-2xl">
+          <div className="bg-gradient-to-b from-blue-900/95 to-cyan-900/95 backdrop-blur-md p-10 rounded-2xl border-3 border-white neon-glow-cyan pointer-events-auto max-w-md w-full mx-4 shadow-2xl max-h-screen overflow-y-auto">
             <h2 className="text-4xl font-black text-white mb-2 text-center drop-shadow-lg">
-              ENTER YOUR NAME
+              JOIN ROOM
             </h2>
             <div className="w-full h-1 bg-gradient-to-r from-white to-transparent mb-8"></div>
+
+            <p className="text-white text-center mb-4 font-semibold text-lg">Step 1: Your Name</p>
             <input
               type="text"
               value={username}
@@ -270,46 +271,14 @@ export default function Home() {
                 setUsername(e.target.value);
                 setError('');
               }}
-              placeholder="Your Name"
+              placeholder="Enter Your Name"
               maxLength={20}
-              className="w-full px-4 py-4 bg-white border-3 border-white rounded-lg text-center text-2xl font-bold text-black placeholder-gray-400 mb-8 focus:outline-none focus:ring-2 focus:ring-white"
+              className="w-full px-4 py-4 bg-white border-3 border-white rounded-lg text-center text-2xl font-bold text-black placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-white"
             />
-            {error && (
-              <p className="text-yellow-300 text-center mb-4 font-bold text-lg drop-shadow-md">
-                ⚠ {error}
-              </p>
-            )}
-            <button
-              onClick={handleUsernameJoin}
-              className="w-full px-6 py-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-black font-black text-xl rounded-lg neon-glow-cyan hover:scale-105 smooth-transition mb-4 shadow-lg drop-shadow-lg"
-            >
-              NEXT
-            </button>
-            <button
-              onClick={() => {
-                setScreen('menu');
-                setError('');
-                setUsername('');
-                setRoomCode('');
-              }}
-              className="w-full px-6 py-3 bg-white text-black font-bold text-lg rounded-lg hover:bg-gray-200 smooth-transition"
-            >
-              BACK TO MENU
-            </button>
-          </div>
-        )}
 
-        {screen === 'join' && username && (
-          <div className="bg-gradient-to-b from-blue-900/95 to-cyan-900/95 backdrop-blur-md p-10 rounded-2xl border-3 border-white neon-glow-cyan pointer-events-auto max-w-md w-full mx-4 shadow-2xl">
-            <h2 className="text-4xl font-black text-white mb-2 text-center drop-shadow-lg">
-              JOIN ROOM
-            </h2>
-            <div className="w-full h-1 bg-gradient-to-r from-white to-transparent mb-6"></div>
-            <p className="text-white text-center mb-4 font-semibold text-lg">
-              Enter your friend&apos;s room code
-            </p>
-            <p className="text-white text-center mb-6 font-bold">
-              Playing as: <span className="text-cyan-300">{username}</span>
+            <p className="text-white text-center mb-4 font-semibold text-lg">Step 2: Room Code</p>
+            <p className="text-white text-center mb-4 font-normal text-sm">
+              (6-character code shared by your friend)
             </p>
             <input
               type="text"
@@ -320,13 +289,15 @@ export default function Home() {
               }}
               placeholder="ABC123"
               maxLength={6}
-              className="w-full px-4 py-4 bg-white border-3 border-white rounded-lg text-center text-2xl font-black text-black placeholder-gray-400 mb-4 focus:outline-none focus:ring-2 focus:ring-white"
+              className="w-full px-4 py-4 bg-white border-3 border-white rounded-lg text-center text-3xl font-black text-black placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-white tracking-widest"
             />
+
             {error && (
-              <p className="text-yellow-300 text-center mb-4 font-bold text-lg drop-shadow-md">
+              <p className="text-yellow-300 text-center mb-6 font-bold text-lg drop-shadow-md bg-red-900/30 p-3 rounded-lg border-2 border-yellow-300">
                 ⚠ {error}
               </p>
             )}
+
             <button
               onClick={handleJoinRoom}
               className="w-full px-6 py-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-black font-black text-xl rounded-lg neon-glow-cyan hover:scale-105 smooth-transition mb-4 shadow-lg drop-shadow-lg"
