@@ -26,7 +26,7 @@ export default function Dashboard() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('email');
-    router.push('/');
+    window.location.href = '/';
   };
 
   if (loading) return <div className="w-full h-screen bg-black flex items-center justify-center text-green-500">Loading...</div>;
