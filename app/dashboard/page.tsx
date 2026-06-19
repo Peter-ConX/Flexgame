@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 const games = [
   { id: 1, name: 'Bible Trivia', icon: '📖', color: 'bg-red-600' },
@@ -18,21 +17,11 @@ const games = [
 ];
 
 export default function Dashboard() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userEmail = localStorage.getItem('email');
-    
-    if (!token) {
-      router.push('/auth/login');
-    } else {
-      setEmail(userEmail || '');
-      setLoading(false);
-    }
-  }, [router]);
+    setLoading(false);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -49,14 +38,13 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-12">
           <div>
             <h1 className="text-4xl font-bold text-green-500">FlexGame</h1>
-            <p className="text-green-400">Welcome, {email}</p>
+            <p className="text-green-400">🌊 River of Games 🌊</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded border border-green-500 transition"
-          >
-            Logout
-          </button>
+          <Link href="/">
+            <button className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded border border-green-500 transition">
+              Home
+            </button>
+          </Link>
         </div>
 
         {/* Games Grid */}

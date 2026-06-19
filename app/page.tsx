@@ -115,14 +115,9 @@ export default function Home() {
         </p>
 
         <div className="flex gap-4 pointer-events-auto">
-          <Link href="/auth/login">
-            <button className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded border-2 border-green-500 transition">
-              Login
-            </button>
-          </Link>
-          <Link href="/auth/signup">
-            <button className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded border-2 border-red-600 transition">
-              Sign Up
+          <Link href="/dashboard">
+            <button className="px-8 py-3 bg-green-600 hover:bg-green-700 text-black font-bold rounded border-2 border-red-600 transition text-lg">
+              Play Games
             </button>
           </Link>
         </div>

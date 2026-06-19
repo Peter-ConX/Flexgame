@@ -109,12 +109,6 @@ export default function GamePage() {
   const [allQuestions, setAllQuestions] = useState<any[]>([]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/auth/login');
-      return;
-    }
-
     // Initialize game based on ID
     setTimeout(() => {
       let questions: any[] = [];
