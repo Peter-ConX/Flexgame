@@ -25,7 +25,7 @@ export function generatePlayerId(): string {
   return `player_${Date.now()}_${Math.random().toString(36).substring(7)}`;
 }
 
-export function createRoom(): Room {
+export function createRoom(username: string): Room {
   const code = generateRoomCode();
   const playerId = generatePlayerId();
 
@@ -35,7 +35,7 @@ export function createRoom(): Room {
     players: [
       {
         id: playerId,
-        name: 'You',
+        name: username,
         score: 0,
         answers: [],
         isHost: true,
@@ -53,7 +53,7 @@ export function createRoom(): Room {
   return room;
 }
 
-export function joinRoom(code: string): Room | null {
+export function joinRoom(code: string, username: string): Room | null {
   const roomData = localStorage.getItem(`room_${code}`);
   if (!roomData) return null;
 
@@ -62,7 +62,7 @@ export function joinRoom(code: string): Room | null {
 
   const newPlayer: Player = {
     id: playerId,
-    name: `Player ${room.players.length + 1}`,
+    name: username,
     score: 0,
     answers: [],
     isHost: false,

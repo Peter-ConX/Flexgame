@@ -6,9 +6,11 @@ import { createRoom, joinRoom } from '@/lib/roomSystem';
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [screen, setScreen] = useState<'menu' | 'create' | 'join'>('menu');
+  const [screen, setScreen] = useState<'menu' | 'username' | 'create' | 'join' | 'room-code'>('menu');
   const [roomCode, setRoomCode] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
+  const [generatedCode, setGeneratedCode] = useState('');
   const particleSystemRef = useRef<ParticleWaterEffect | null>(null);
   const animationRef = useRef<number | null>(null);
 
@@ -58,13 +60,31 @@ export default function Home() {
     };
   }, []);
 
-  const handleCreateRoom = () => {
+  const handleUsernameCreate = () => {
+    if (!username.trim()) {
+      setError('Please enter a username');
+      return;
+    }
     try {
-      const room = createRoom();
-      window.location.href = `/quiz?room=${room.code}`;
+      const room = createRoom(username);
+      localStorage.setItem('currentPlayerId', room.players[0].id);
+      localStorage.setItem('currentUsername', username);
+      setGeneratedCode(room.code);
+      setScreen('room-code');
+      setError('');
     } catch (err) {
       setError('Failed to create room');
     }
+  };
+
+  const handleUsernameJoin = () => {
+    if (!username.trim()) {
+      setError('Please enter a username');
+      return;
+    }
+    setScreen('join');
+    setUsername('');
+    setError('');
   };
 
   const handleJoinRoom = () => {
@@ -73,13 +93,23 @@ export default function Home() {
       return;
     }
 
-    const room = joinRoom(roomCode.toUpperCase());
+    const room = joinRoom(roomCode.toUpperCase(), username);
     if (!room) {
       setError('Room not found');
       return;
     }
 
+    const newPlayer = room.players.find((p) => p.name === username);
+    if (newPlayer) {
+      localStorage.setItem('currentPlayerId', newPlayer.id);
+      localStorage.setItem('currentUsername', username);
+    }
+
     window.location.href = `/quiz?room=${roomCode.toUpperCase()}`;
+  };
+
+  const handleStartQuizFromCode = () => {
+    window.location.href = `/quiz?room=${generatedCode}`;
   };
 
   return (
@@ -119,6 +149,84 @@ export default function Home() {
           </div>
         )}
 
+        {screen === 'username' && (
+          <div className="bg-gradient-to-b from-purple-900/95 to-purple-800/95 backdrop-blur-md p-10 rounded-2xl border-3 border-accent-gold neon-glow pointer-events-auto max-w-md w-full mx-4 shadow-2xl">
+            <h2 className="text-4xl font-black text-white mb-2 text-center drop-shadow-lg">
+              ENTER YOUR NAME
+            </h2>
+            <div className="w-full h-1 bg-gradient-to-r from-accent-gold to-transparent mb-8"></div>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError('');
+              }}
+              placeholder="Your Name"
+              maxLength={20}
+              className="w-full px-4 py-4 bg-white border-3 border-accent-gold rounded-lg text-center text-2xl font-bold text-black placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-accent-gold"
+            />
+            {error && (
+              <p className="text-yellow-300 text-center mb-4 font-bold text-lg drop-shadow-md">
+                ⚠ {error}
+              </p>
+            )}
+            <button
+              onClick={handleUsernameCreate}
+              className="w-full px-6 py-4 bg-gradient-to-r from-accent-gold to-yellow-500 text-black font-black text-xl rounded-lg neon-glow hover:scale-105 smooth-transition mb-4 shadow-lg drop-shadow-lg"
+            >
+              CREATE ROOM
+            </button>
+            <button
+              onClick={() => {
+                setScreen('menu');
+                setUsername('');
+                setError('');
+              }}
+              className="w-full px-6 py-3 bg-white text-black font-bold text-lg rounded-lg hover:bg-gray-200 smooth-transition"
+            >
+              BACK TO MENU
+            </button>
+          </div>
+        )}
+
+        {screen === 'room-code' && (
+          <div className="bg-gradient-to-b from-purple-900/95 to-purple-800/95 backdrop-blur-md p-10 rounded-2xl border-3 border-accent-gold neon-glow pointer-events-auto max-w-md w-full mx-4 shadow-2xl">
+            <h2 className="text-4xl font-black text-white mb-2 text-center drop-shadow-lg">
+              ROOM CODE
+            </h2>
+            <div className="w-full h-1 bg-gradient-to-r from-accent-gold to-transparent mb-8"></div>
+            <p className="text-white text-center mb-4 font-semibold text-lg">
+              Share this code with your friend
+            </p>
+            <div className="bg-white border-4 border-accent-gold rounded-lg p-6 mb-8 text-center">
+              <p className="text-5xl font-black text-black drop-shadow-lg">
+                {generatedCode}
+              </p>
+            </div>
+            <p className="text-white text-center mb-8 font-semibold text-sm">
+              Waiting for opponent to join...
+            </p>
+            <button
+              onClick={handleStartQuizFromCode}
+              className="w-full px-6 py-4 bg-gradient-to-r from-accent-gold to-yellow-500 text-black font-black text-xl rounded-lg neon-glow hover:scale-105 smooth-transition mb-4 shadow-lg drop-shadow-lg"
+            >
+              START QUIZ
+            </button>
+            <button
+              onClick={() => {
+                setScreen('menu');
+                setUsername('');
+                setGeneratedCode('');
+                setError('');
+              }}
+              className="w-full px-6 py-3 bg-white text-black font-bold text-lg rounded-lg hover:bg-gray-200 smooth-transition"
+            >
+              BACK TO MENU
+            </button>
+          </div>
+        )}
+
         {screen === 'create' && (
           <div className="bg-gradient-to-b from-purple-900/95 to-purple-800/95 backdrop-blur-md p-10 rounded-2xl border-3 border-accent-gold neon-glow pointer-events-auto max-w-md w-full mx-4 shadow-2xl">
             <h2 className="text-4xl font-black text-white mb-2 text-center drop-shadow-lg">
@@ -129,7 +237,10 @@ export default function Home() {
               Generate a unique code to share with your friend
             </p>
             <button
-              onClick={handleCreateRoom}
+              onClick={() => {
+                setScreen('username');
+                setError('');
+              }}
               className="w-full px-6 py-4 bg-gradient-to-r from-accent-gold to-yellow-500 text-black font-black text-xl rounded-lg neon-glow hover:scale-105 smooth-transition mb-4 shadow-lg drop-shadow-lg"
             >
               START NEW GAME
@@ -149,11 +260,56 @@ export default function Home() {
         {screen === 'join' && (
           <div className="bg-gradient-to-b from-blue-900/95 to-cyan-900/95 backdrop-blur-md p-10 rounded-2xl border-3 border-white neon-glow-cyan pointer-events-auto max-w-md w-full mx-4 shadow-2xl">
             <h2 className="text-4xl font-black text-white mb-2 text-center drop-shadow-lg">
+              ENTER YOUR NAME
+            </h2>
+            <div className="w-full h-1 bg-gradient-to-r from-white to-transparent mb-8"></div>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                setError('');
+              }}
+              placeholder="Your Name"
+              maxLength={20}
+              className="w-full px-4 py-4 bg-white border-3 border-white rounded-lg text-center text-2xl font-bold text-black placeholder-gray-400 mb-8 focus:outline-none focus:ring-2 focus:ring-white"
+            />
+            {error && (
+              <p className="text-yellow-300 text-center mb-4 font-bold text-lg drop-shadow-md">
+                ⚠ {error}
+              </p>
+            )}
+            <button
+              onClick={handleUsernameJoin}
+              className="w-full px-6 py-4 bg-gradient-to-r from-blue-400 to-cyan-400 text-black font-black text-xl rounded-lg neon-glow-cyan hover:scale-105 smooth-transition mb-4 shadow-lg drop-shadow-lg"
+            >
+              NEXT
+            </button>
+            <button
+              onClick={() => {
+                setScreen('menu');
+                setError('');
+                setUsername('');
+                setRoomCode('');
+              }}
+              className="w-full px-6 py-3 bg-white text-black font-bold text-lg rounded-lg hover:bg-gray-200 smooth-transition"
+            >
+              BACK TO MENU
+            </button>
+          </div>
+        )}
+
+        {screen === 'join' && username && (
+          <div className="bg-gradient-to-b from-blue-900/95 to-cyan-900/95 backdrop-blur-md p-10 rounded-2xl border-3 border-white neon-glow-cyan pointer-events-auto max-w-md w-full mx-4 shadow-2xl">
+            <h2 className="text-4xl font-black text-white mb-2 text-center drop-shadow-lg">
               JOIN ROOM
             </h2>
             <div className="w-full h-1 bg-gradient-to-r from-white to-transparent mb-6"></div>
-            <p className="text-white text-center mb-8 font-semibold text-lg">
-              Enter your friend&apos;s 6-digit code
+            <p className="text-white text-center mb-4 font-semibold text-lg">
+              Enter your friend&apos;s room code
+            </p>
+            <p className="text-white text-center mb-6 font-bold">
+              Playing as: <span className="text-cyan-300">{username}</span>
             </p>
             <input
               type="text"
@@ -164,7 +320,7 @@ export default function Home() {
               }}
               placeholder="ABC123"
               maxLength={6}
-              className="w-full px-4 py-4 bg-white border-3 border-accent-gold rounded-lg text-center text-2xl font-black text-black placeholder-gray-400 mb-4 focus:outline-none focus:ring-2 focus:ring-accent-gold"
+              className="w-full px-4 py-4 bg-white border-3 border-white rounded-lg text-center text-2xl font-black text-black placeholder-gray-400 mb-4 focus:outline-none focus:ring-2 focus:ring-white"
             />
             {error && (
               <p className="text-yellow-300 text-center mb-4 font-bold text-lg drop-shadow-md">
@@ -181,6 +337,7 @@ export default function Home() {
               onClick={() => {
                 setScreen('menu');
                 setError('');
+                setUsername('');
                 setRoomCode('');
               }}
               className="w-full px-6 py-3 bg-white text-black font-bold text-lg rounded-lg hover:bg-gray-200 smooth-transition"

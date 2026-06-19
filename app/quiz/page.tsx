@@ -189,6 +189,7 @@ function QuizContent() {
             <div className="space-y-4">
               {ranking.map((player, index) => {
                 const medals = ['🥇', '🥈', '🥉'];
+                const isWinner = index === 0;
                 return (
                   <div
                     key={player.id}
@@ -201,7 +202,8 @@ function QuizContent() {
                     <div className="flex items-center gap-4">
                       <span className="text-3xl w-10">{medals[index] || '📌'}</span>
                       <div>
-                        <p className="text-white text-lg">
+                        <p className="text-white text-lg flex items-center gap-2">
+                          {isWinner && <span className="text-3xl">👑</span>}
                           {player.name}
                           {player.id === playerInfo.id ? ' (You)' : ''}
                         </p>
