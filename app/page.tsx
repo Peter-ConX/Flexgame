@@ -67,6 +67,9 @@ export default function Home() {
     }
     try {
       const room = createRoom(username);
+      console.log('[v0] Room created:', room.code);
+      console.log('[v0] Stored in localStorage with key:', `room_${room.code}`);
+      console.log('[v0] localStorage content:', localStorage.getItem(`room_${room.code}`));
       localStorage.setItem('currentPlayerId', room.players[0].id);
       localStorage.setItem('currentUsername', username);
       setGeneratedCode(room.code);
@@ -92,11 +95,17 @@ export default function Home() {
       return;
     }
 
+    console.log('[v0] Attempting to join room with code:', roomCode.toUpperCase());
+    console.log('[v0] Looking for localStorage key:', `room_${roomCode.toUpperCase()}`);
+    console.log('[v0] Found in localStorage:', localStorage.getItem(`room_${roomCode.toUpperCase()}`));
+    
     const room = joinRoom(roomCode.toUpperCase(), username);
     if (!room) {
+      console.log('[v0] Room not found!');
       setError('Room code not found. Check and try again.');
       return;
     }
+    console.log('[v0] Room found:', room.code);
 
     const newPlayer = room.players.find((p) => p.name === username);
     if (newPlayer) {
