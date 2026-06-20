@@ -46,7 +46,10 @@ export function createRoom(username: string): Room {
     createdAt: Date.now(),
   };
 
+  console.log('[v0] createRoom: Generated code =', code);
+  console.log('[v0] createRoom: Saving to localStorage with key =', `room_${code}`);
   localStorage.setItem(`room_${code}`, JSON.stringify(room));
+  console.log('[v0] createRoom: Verification - Retrieved from localStorage =', localStorage.getItem(`room_${code}`));
   localStorage.setItem('currentRoomCode', code);
   localStorage.setItem('currentPlayerId', playerId);
 
@@ -54,8 +57,14 @@ export function createRoom(username: string): Room {
 }
 
 export function joinRoom(code: string, username: string): Room | null {
+  console.log('[v0] joinRoom: Looking for code =', code);
+  console.log('[v0] joinRoom: Looking in localStorage for key =', `room_${code}`);
   const roomData = localStorage.getItem(`room_${code}`);
-  if (!roomData) return null;
+  console.log('[v0] joinRoom: Retrieved roomData =', roomData);
+  if (!roomData) {
+    console.log('[v0] joinRoom: Room data not found in localStorage!');
+    return null;
+  }
 
   const room: Room = JSON.parse(roomData);
   const playerId = generatePlayerId();
