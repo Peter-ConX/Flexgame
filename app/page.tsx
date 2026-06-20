@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { ParticleWaterEffect } from '@/lib/particleWater';
-import { createRoom, joinRoom } from '@/lib/roomSystem';
+import { createRoom as createRoomAction, joinRoom as joinRoomAction } from '@/app/actions/rooms';
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -60,17 +60,14 @@ export default function Home() {
     };
   }, []);
 
-  const handleUsernameCreate = () => {
+  const handleUsernameCreate = async () => {
     if (!username.trim()) {
       setError('Please enter a username');
       return;
     }
     try {
-      const room = createRoom(username);
-      console.log('[v0] Room created:', room.code);
-      console.log('[v0] Stored in localStorage with key:', `room_${room.code}`);
-      console.log('[v0] localStorage content:', localStorage.getItem(`room_${room.code}`));
-      localStorage.setItem('currentPlayerId', room.players[0].id);
+      const room = await createRoomAction(username);
+      localStorage.setItem('currentPlayerId', room.playerId);
       localStorage.setItem('currentUsername', username);
       setGeneratedCode(room.code);
       setScreen('room-code');
@@ -85,7 +82,7 @@ export default function Home() {
     setError('');
   };
 
-  const handleJoinRoom = () => {
+  const handleJoinRoom = async () => {
     if (!username.trim()) {
       setError('Please enter your name');
       return;
@@ -95,25 +92,19 @@ export default function Home() {
       return;
     }
 
-    console.log('[v0] Attempting to join room with code:', roomCode.toUpperCase());
-    console.log('[v0] Looking for localStorage key:', `room_${roomCode.toUpperCase()}`);
-    console.log('[v0] Found in localStorage:', localStorage.getItem(`room_${roomCode.toUpperCase()}`));
-    
-    const room = joinRoom(roomCode.toUpperCase(), username);
-    if (!room) {
-      console.log('[v0] Room not found!');
-      setError('Room code not found. Check and try again.');
-      return;
-    }
-    console.log('[v0] Room found:', room.code);
+    try {
+      const result = await joinRoomAction(roomCode.toUpperCase(), username);
+      if (!result) {
+        setError('Room code not found. Check and try again.');
+        return;
+      }
 
-    const newPlayer = room.players.find((p) => p.name === username);
-    if (newPlayer) {
-      localStorage.setItem('currentPlayerId', newPlayer.id);
+      localStorage.setItem('currentPlayerId', result.playerId);
       localStorage.setItem('currentUsername', username);
+      window.location.href = `/quiz?room=${roomCode.toUpperCase()}`;
+    } catch (err) {
+      setError('Failed to join room');
     }
-
-    window.location.href = `/quiz?room=${roomCode.toUpperCase()}`;
   };
 
   const handleStartQuizFromCode = () => {

@@ -4,12 +4,12 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getShuffledQuestions, type Question } from '@/lib/bibleQuestions';
 import {
-  getRoom,
-  updatePlayerAnswer,
+  getRoomData,
   updatePlayerScore,
+  updatePlayerAnswers,
   finishGame,
   getRanking,
-} from '@/lib/roomSystem';
+} from '@/app/actions/rooms';
 
 function QuizContent() {
   const searchParams = useSearchParams();
@@ -33,36 +33,40 @@ function QuizContent() {
       return;
     }
 
-    const room = getRoom(roomCode);
-    if (!room) {
-      window.location.href = '/';
-      return;
-    }
+    const loadRoom = async () => {
+      const room = await getRoomData(roomCode);
+      if (!room) {
+        window.location.href = '/';
+        return;
+      }
 
-    const playerId = localStorage.getItem('currentPlayerId');
-    if (!playerId) {
-      window.location.href = '/';
-      return;
-    }
+      const playerId = localStorage.getItem('currentPlayerId');
+      if (!playerId) {
+        window.location.href = '/';
+        return;
+      }
 
-    const currentPlayer = room.players.find((p) => p.id === playerId);
-    if (!currentPlayer) {
-      window.location.href = '/';
-      return;
-    }
+      const currentPlayer = room.players.find((p) => p.id === playerId);
+      if (!currentPlayer) {
+        window.location.href = '/';
+        return;
+      }
 
-    setPlayerInfo({ id: playerId, name: currentPlayer.name });
+      setPlayerInfo({ id: playerId, name: currentPlayer.name });
 
-    const opponent = room.players.find((p) => p.id !== playerId);
-    if (opponent) {
-      setOpponentInfo({
-        id: opponent.id,
-        name: opponent.name,
-        score: opponent.score,
-      });
-    }
+      const opponent = room.players.find((p) => p.id !== playerId);
+      if (opponent) {
+          setOpponentInfo({
+          id: opponent.id,
+          name: opponent.name,
+          score: opponent.score,
+        });
+      }
 
-    setQuestions(getShuffledQuestions());
+      setQuestions(getShuffledQuestions());
+    };
+
+    loadRoom();
   }, [roomCode]);
 
   useEffect(() => {
@@ -80,12 +84,12 @@ function QuizContent() {
     };
   }, [timeLeft, gameStarted, gameOver]);
 
-  const handleAnswer = (optionIndex: number) => {
+  const handleAnswer = async (optionIndex: number) => {
     if (showResult || !gameStarted) return;
 
     const newAnswers = [...answers, optionIndex];
     setAnswers(newAnswers);
-    updatePlayerAnswer(roomCode!, playerInfo.id, currentQuestion, optionIndex);
+    await updatePlayerAnswers(playerInfo.id, newAnswers);
 
     const isCorrect =
       optionIndex === questions[currentQuestion].correct;
@@ -93,7 +97,7 @@ function QuizContent() {
     if (isCorrect) {
       const newScore = score + 1;
       setScore(newScore);
-      updatePlayerScore(roomCode!, playerInfo.id, newScore);
+      await updatePlayerScore(playerInfo.id, newScore);
     }
 
     setShowResult(true);
